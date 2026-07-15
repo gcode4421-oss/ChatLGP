@@ -1,0 +1,16 @@
+#.local.properties — نموذج
+# عدّل المسارات حسب نظامك
+
+# مسار Flutter SDK
+# مثال Linux/Mac:
+# flutter.sdk=/home/USER/flutter
+# مثال Windows:
+# flutter.sdk=C:\\src\\flutter
+
+# مسار Android SDK
+# sdk.dir=/home/USER/Android/Sdk
+
+# تخصيصات إضافية
+# flutter.buildMode=release
+# flutter.versionName=1.0.0
+# flutter.versionCode=1
