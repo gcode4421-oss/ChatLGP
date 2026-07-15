@@ -1,0 +1,72 @@
+name: Build APK
+
+# هذا الملف جاهز للنسخ إلى .github/workflows/build-apk.yml
+# الـ token المستخدم لا يملك صلاحية workflow، لذا يرجى:
+# 1. اذهب إلى https://github.com/gcode4421-oss/ChatLGP
+# 2. اضغط "Add file" → "Create new file"
+# 3. اسم الملف: .github/workflows/build-apk.yml
+# 4. الصق محتوى هذا الملف
+# 5. Commit changes
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build Android APK
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.22.0'
+          channel: stable
+          cache: true
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Generate launcher icons
+        run: dart run flutter_launcher_icons || true
+
+      - name: Analyze project source
+        run: flutter analyze || true
+
+      - name: Build APK (debug)
+        run: flutter build apk --debug
+
+      - name: Build APK (release, split per ABI)
+        run: flutter build apk --release --split-per-abi
+
+      - name: Upload debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: localai-debug-apk
+          path: build/app/outputs/flutter-apk/app-debug.apk
+          retention-days: 30
+
+      - name: Upload release APKs
+        uses: actions/upload-artifact@v4
+        with:
+          name: localai-release-apks
+          path: |
+            build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
+            build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk
+            build/app/outputs/flutter-apk/app-x86_64-release.apk
+            build/app/outputs/flutter-apk/app-release.apk
+          retention-days: 30
